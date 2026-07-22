@@ -1,0 +1,65 @@
+%% DevArena Judge Service — complete judging workflow
+sequenceDiagram
+    autonumber
+    actor User
+    participant API as Submission API
+    participant SS as SubmissionService
+    participant DB as Postgres (Submission)
+    participant Q as BullMQ (judge-submissions)
+    participant W as Judge Worker
+    participant JE as JudgeEngine
+    participant TR as TestCase Repo
+    participant EX as Execution Engine
+    participant CMP as Comparator
+    participant SC as ScoringService
+    participant EV as Redis Pub/Sub
+    participant SOCK as Socket Layer (assumed)
+
+    User->>API: POST /submission { problemId, language, code }
+    API->>SS: create(...)
+    SS->>SS: validate language
+    SS->>SS: rate-limit (Redis INCR)
+    SS->>DB: findRecentDuplicate (dedup guard)
+    SS->>TR: problemConfig (time/mem limits)
+    SS->>DB: create submission (PENDING)
+    SS->>EV: publish submission.created
+    SS->>Q: enqueue(jobData, priority)
+    SS->>DB: status = QUEUED
+    API-->>User: 202 { submissionId, QUEUED }
+
+    Q->>W: deliver job (priority order)
+    W->>JE: judge(job)
+    JE->>EV: publish submission.started
+    JE->>DB: status = RUNNING
+    JE->>TR: forProblem(problemId) → test cases
+    Note over JE: public/sample first, then hidden
+
+    loop each test case (bounded parallelism)
+        JE->>EX: run(code, stdin, limits)
+        EX-->>JE: { status, stdout, time, memory }
+        alt engine-level failure
+            JE->>JE: verdict = CE/RE/TLE/MLE/OLE
+        else compare output
+            JE->>CMP: compare(stdout, expected)
+            CMP-->>JE: { match, presentationError }
+            JE->>JE: verdict = AC / PE / WA
+        end
+        JE->>EV: publish submission.running (per-case, streaming)
+        opt stop-on-first-failure and failed
+            JE->>JE: remaining cases = SKIPPED
+        end
+    end
+
+    JE->>SC: aggregate(results)
+    SC-->>JE: { verdict, score, %, peak mem, max runtime }
+    JE->>DB: saveVerdict (submission + results, 1 txn)
+    JE->>EV: publish submission.verdict
+    JE->>EV: publish submission.completed
+    EV->>SOCK: fan-out events
+    SOCK-->>User: live verdict + score
+
+    alt retries exhausted
+        W->>Q: route to DLQ
+        W->>DB: status = INTERNAL_ERROR
+        W->>EV: publish submission.failed
+    end

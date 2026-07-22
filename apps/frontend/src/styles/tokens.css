@@ -1,0 +1,100 @@
+/**
+ * DevArena design tokens.
+ *
+ * Direction (per brief): the precise, low-chrome register of Linear /
+ * GitHub / Vercel — near-black canvas, hairline borders, one decisive
+ * accent, and typography doing the work instead of decoration.
+ *
+ * Every colour is SEMANTIC (canvas / surface / border / fg / accent)
+ * rather than literal, so the same class names serve both themes. The
+ * light palette is a genuine inversion, not a washed-out dark theme.
+ *
+ * Theme switching: `html.dark` / `html.light`. Defaults to dark.
+ */
+
+@theme {
+  /* Typography. Mono is a UTILITY face used deliberately for labels,
+     eyebrows, verdicts and numbers — true to a coding platform, and it
+     keeps the sans face free to be quiet. */
+  --font-sans: 'Inter', 'Instrument Sans', system-ui, -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, 'SF Mono', monospace;
+  --font-display: 'Unbounded', var(--font-sans);
+
+  /* Motion */
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-spring: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* ── Dark (default) ─────────────────────────────────────────────── */
+:root,
+html.dark {
+  --color-canvas: #08080a;
+  --color-surface: #101013;
+  --color-elevated: #17171b;
+  --color-border: #232329;
+  --color-border-strong: #33333b;
+  --color-fg: #ededf0;
+  --color-fg-muted: #8b8b96;
+  --color-fg-subtle: #5c5c66;
+
+  --color-accent: #6e56cf;
+  --color-accent-hover: #7c66d9;
+  --color-accent-fg: #ffffff;
+  --color-accent-subtle: rgba(110, 86, 207, 0.14);
+
+  --color-success: #3dd68c;
+  --color-warning: #ffb224;
+  --color-danger: #f2555a;
+  --color-danger-subtle: rgba(242, 85, 90, 0.13);
+  --color-info: #52a9ff;
+
+  --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.03);
+  --shadow-pop: 0 16px 48px -12px rgba(0, 0, 0, 0.7);
+}
+
+/* ── Light ──────────────────────────────────────────────────────── */
+html.light {
+  --color-canvas: #ffffff;
+  --color-surface: #fafafa;
+  --color-elevated: #ffffff;
+  --color-border: #e6e6ea;
+  --color-border-strong: #d2d2da;
+  --color-fg: #17171a;
+  --color-fg-muted: #62626d;
+  --color-fg-subtle: #8f8f9a;
+
+  --color-accent: #5b44bd;
+  --color-accent-hover: #4e39a8;
+  --color-accent-fg: #ffffff;
+  --color-accent-subtle: rgba(91, 68, 189, 0.09);
+
+  --color-success: #1a9e63;
+  --color-warning: #b25e02;
+  --color-danger: #d92d33;
+  --color-danger-subtle: rgba(217, 45, 51, 0.08);
+  --color-info: #0b6bcb;
+
+  --shadow-card: 0 1px 2px rgba(16, 16, 20, 0.06), 0 0 0 1px rgba(16, 16, 20, 0.04);
+  --shadow-pop: 0 16px 48px -12px rgba(16, 16, 20, 0.18);
+}
+
+/* Expose the semantic ramp to Tailwind utilities (bg-canvas, text-fg…). */
+@theme inline {
+  --color-canvas: var(--color-canvas);
+  --color-surface: var(--color-surface);
+  --color-elevated: var(--color-elevated);
+  --color-border: var(--color-border);
+  --color-border-strong: var(--color-border-strong);
+  --color-fg: var(--color-fg);
+  --color-fg-muted: var(--color-fg-muted);
+  --color-fg-subtle: var(--color-fg-subtle);
+  --color-accent: var(--color-accent);
+  --color-accent-hover: var(--color-accent-hover);
+  --color-accent-fg: var(--color-accent-fg);
+  --color-accent-subtle: var(--color-accent-subtle);
+  --color-success: var(--color-success);
+  --color-warning: var(--color-warning);
+  --color-danger: var(--color-danger);
+  --color-danger-subtle: var(--color-danger-subtle);
+  --color-info: var(--color-info);
+}

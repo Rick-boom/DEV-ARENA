@@ -1,0 +1,8 @@
+# Python sandbox image. Official slim 3.12. Interpreted — no compile
+# step. Run with `python3 -I` (isolated mode: ignores env vars and
+# user site-packages) for reproducibility and a smaller attack surface.
+FROM python:3.12-slim
+
+WORKDIR /sandbox
+USER 65534:65534
+CMD ["true"]

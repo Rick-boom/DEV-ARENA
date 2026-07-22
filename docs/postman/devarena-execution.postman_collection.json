@@ -1,0 +1,364 @@
+{
+  "info": {
+    "name": "DevArena \u2014 Execution Engine API",
+    "description": "Remote code execution over a BullMQ queue. Set {{execBaseUrl}} (e.g. http://localhost:5001). Each request runs in a single-use, network-isolated, resource-capped Docker container.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "execBaseUrl",
+      "value": "http://localhost:5001"
+    }
+  ],
+  "item": [
+    {
+      "name": "System",
+      "item": [
+        {
+          "name": "Health + queue depth",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{execBaseUrl}}/health",
+              "host": [
+                "{{execBaseUrl}}"
+              ],
+              "path": [
+                "health"
+              ]
+            },
+            "description": "Liveness probe; returns live BullMQ job counts."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Execute \u2014 verdicts",
+      "item": [
+        {
+          "name": "Python \u2014 ACCEPTED",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{execBaseUrl}}/execute",
+              "host": [
+                "{{execBaseUrl}}"
+              ],
+              "path": [
+                "execute"
+              ]
+            },
+            "description": "Reads two ints from stdin, prints their sum. Expect status ACCEPTED, stdout \"9\".",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"language\": \"python\",\n  \"code\": \"print(sum(map(int, input().split())))\",\n  \"input\": \"2 7\"\n}"
+            }
+          }
+        },
+        {
+          "name": "JavaScript \u2014 ACCEPTED",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{execBaseUrl}}/execute",
+              "host": [
+                "{{execBaseUrl}}"
+              ],
+              "path": [
+                "execute"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"language\": \"javascript\",\n  \"code\": \"const [a,b]=require('fs').readFileSync(0,'utf8').split(' ').map(Number);console.log(a+b);\",\n  \"input\": \"3 4\"\n}"
+            }
+          }
+        },
+        {
+          "name": "C++ \u2014 ACCEPTED (compiled)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{execBaseUrl}}/execute",
+              "host": [
+                "{{execBaseUrl}}"
+              ],
+              "path": [
+                "execute"
+              ]
+            },
+            "description": "Exercises the compile\u2192run path.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"language\": \"cpp\",\n  \"code\": \"#include <iostream>\\nint main(){long a,b;std::cin>>a>>b;std::cout<<a+b;}\",\n  \"input\": \"10 20\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Java \u2014 ACCEPTED (compiled)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{execBaseUrl}}/execute",
+              "host": [
+                "{{execBaseUrl}}"
+              ],
+              "path": [
+                "execute"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"language\": \"java\",\n  \"code\": \"import java.util.*;public class Main{public static void main(String[] a){Scanner s=new Scanner(System.in);System.out.println(s.nextLong()+s.nextLong());}}\",\n  \"input\": \"5 6\"\n}"
+            }
+          }
+        },
+        {
+          "name": "C++ \u2014 COMPILATION_ERROR",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{execBaseUrl}}/execute",
+              "host": [
+                "{{execBaseUrl}}"
+              ],
+              "path": [
+                "execute"
+              ]
+            },
+            "description": "Expect status COMPILATION_ERROR with compiler stderr in the result.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"language\": \"cpp\",\n  \"code\": \"int main(){ this is not c++ }\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Python \u2014 RUNTIME_ERROR",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{execBaseUrl}}/execute",
+              "host": [
+                "{{execBaseUrl}}"
+              ],
+              "path": [
+                "execute"
+              ]
+            },
+            "description": "Non-zero exit \u2192 status RUNTIME_ERROR.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"language\": \"python\",\n  \"code\": \"raise ValueError('boom')\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Python \u2014 TIME_LIMIT_EXCEEDED",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{execBaseUrl}}/execute",
+              "host": [
+                "{{execBaseUrl}}"
+              ],
+              "path": [
+                "execute"
+              ]
+            },
+            "description": "Infinite loop; the watchdog force-kills the container. Expect TIME_LIMIT_EXCEEDED.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"language\": \"python\",\n  \"code\": \"while True: pass\",\n  \"timeLimitMs\": 1000\n}"
+            }
+          }
+        },
+        {
+          "name": "Python \u2014 MEMORY_LIMIT_EXCEEDED",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{execBaseUrl}}/execute",
+              "host": [
+                "{{execBaseUrl}}"
+              ],
+              "path": [
+                "execute"
+              ]
+            },
+            "description": "Allocates past the cap; OOM kill \u2192 MEMORY_LIMIT_EXCEEDED.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"language\": \"python\",\n  \"code\": \"x=' '*(10**9)\",\n  \"memoryLimitMb\": 32\n}"
+            }
+          }
+        },
+        {
+          "name": "Python \u2014 OUTPUT_LIMIT_EXCEEDED",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{execBaseUrl}}/execute",
+              "host": [
+                "{{execBaseUrl}}"
+              ],
+              "path": [
+                "execute"
+              ]
+            },
+            "description": "Floods stdout past the output ceiling \u2192 OUTPUT_LIMIT_EXCEEDED (truncated).",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"language\": \"python\",\n  \"code\": \"print('a'*10_000_000)\"\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Execute \u2014 errors",
+      "item": [
+        {
+          "name": "VALIDATION_ERROR \u2014 bad language",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{execBaseUrl}}/execute",
+              "host": [
+                "{{execBaseUrl}}"
+              ],
+              "path": [
+                "execute"
+              ]
+            },
+            "description": "422 with code VALIDATION_ERROR.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"language\": \"ruby\",\n  \"code\": \"puts 1\"\n}"
+            }
+          }
+        },
+        {
+          "name": "VALIDATION_ERROR \u2014 empty code",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{execBaseUrl}}/execute",
+              "host": [
+                "{{execBaseUrl}}"
+              ],
+              "path": [
+                "execute"
+              ]
+            },
+            "description": "422.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"language\": \"python\",\n  \"code\": \"\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Priority submission",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{execBaseUrl}}/execute",
+              "host": [
+                "{{execBaseUrl}}"
+              ],
+              "path": [
+                "execute"
+              ]
+            },
+            "description": "Lower priority number jumps the queue.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"language\": \"python\",\n  \"code\": \"print('vip')\",\n  \"priority\": 1\n}"
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

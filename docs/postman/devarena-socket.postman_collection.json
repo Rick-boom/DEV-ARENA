@@ -1,0 +1,154 @@
+{
+  "info": {
+    "name": "DevArena \u2014 Socket Service",
+    "description": "Real-time gateway. HTTP endpoints below are directly callable in Postman. Socket.IO events are documented as a reference (connect a Socket.IO client to {{wsUrl}}/rt with auth.token = your JWT).",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "httpUrl",
+      "value": "http://localhost:4100"
+    },
+    {
+      "key": "wsUrl",
+      "value": "ws://localhost:4100"
+    },
+    {
+      "key": "accessToken",
+      "value": ""
+    }
+  ],
+  "item": [
+    {
+      "name": "HTTP",
+      "item": [
+        {
+          "name": "Health + local connections",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{httpUrl}}/health",
+              "host": [
+                "{{httpUrl}}"
+              ],
+              "path": [
+                "health"
+              ]
+            }
+          }
+        },
+        {
+          "name": "AsyncAPI event contract",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{httpUrl}}/docs.json",
+              "host": [
+                "{{httpUrl}}"
+              ],
+              "path": [
+                "docs.json"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Socket.IO events (reference)",
+      "description": "Connect a Socket.IO v4 client to {{wsUrl}}/rt with { auth: { token: {{accessToken}} } }, then emit these. Payloads shown as JSON.",
+      "item": [
+        {
+          "name": "room:create",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{wsUrl}}/rt"
+            },
+            "description": "emit('room:create', { \"type\": \"battle\" }, ack) -> ack { ok, data:{ room } }. type \u2208 battle|collaboration|interview."
+          }
+        },
+        {
+          "name": "room:join",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{wsUrl}}/rt"
+            },
+            "description": "emit('room:join', { \"roomId\": \"...\" }, ack) -> ack { ok, data:{ room, participants } }. Others get room:user-joined. Errors: ROOM_NOT_FOUND, ROOM_FULL."
+          }
+        },
+        {
+          "name": "room:leave",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{wsUrl}}/rt"
+            },
+            "description": "emit('room:leave', { \"roomId\": \"...\" }, ack). Others get room:user-left."
+          }
+        },
+        {
+          "name": "room:delete",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{wsUrl}}/rt"
+            },
+            "description": "Owner-only. emit('room:delete', { \"roomId\": \"...\" }, ack). All get room:closed. Error: UNAUTHORIZED."
+          }
+        },
+        {
+          "name": "room:transfer-ownership",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{wsUrl}}/rt"
+            },
+            "description": "Owner-only. emit('room:transfer-ownership', { \"roomId\": \"...\", \"toUserId\": \"...\" }, ack). All get room:ownership-changed."
+          }
+        },
+        {
+          "name": "presence:update",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{wsUrl}}/rt"
+            },
+            "description": "emit('presence:update', { \"roomId\": \"...\", \"focused\": false }). Others get presence:changed."
+          }
+        },
+        {
+          "name": "typing:start / typing:stop",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{wsUrl}}/rt"
+            },
+            "description": "emit('typing:start', { \"roomId\": \"...\" }). Others get typing:changed."
+          }
+        },
+        {
+          "name": "cursor:update",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{wsUrl}}/rt"
+            },
+            "description": "emit('cursor:update', { \"roomId\": \"...\", \"cursor\": { \"line\": 3, \"column\": 5 }, \"nonce\": 1 }). nonce must strictly increase. Others get cursor:changed."
+          }
+        },
+        {
+          "name": "heartbeat",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{wsUrl}}/rt"
+            },
+            "description": "emit('heartbeat', ack) -> ack { ts } for RTT measurement."
+          }
+        }
+      ]
+    }
+  ]
+}

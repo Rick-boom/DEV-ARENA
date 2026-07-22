@@ -1,0 +1,145 @@
+# Local development stack. `docker compose up -d --build` brings up the
+# full platform behind NGINX on http://localhost:8080.
+# Data stores use named volumes so data survives restarts.
+
+name: devarena
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: devarena
+      POSTGRES_PASSWORD: devarena
+      POSTGRES_DB: devarena
+    ports:
+      - '5432:5432'
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U devarena -d devarena']
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    command: ['redis-server', '--appendonly', 'yes']
+    ports:
+      - '6379:6379'
+    volumes:
+      - redisdata:/data
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  backend:
+    build:
+      context: .
+      dockerfile: apps/backend/Dockerfile
+    environment:
+      NODE_ENV: production
+      PORT: 4000
+      DATABASE_URL: postgresql://devarena:devarena@postgres:5432/devarena?schema=public
+      REDIS_URL: redis://redis:6379
+      CORS_ORIGIN: http://localhost:8080,http://localhost:5173
+      JWT_ACCESS_SECRET: dev-only-access-secret-change-me
+      JWT_REFRESH_SECRET: dev-only-refresh-secret-change-me
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    expose:
+      - '4000'
+
+  execution-api:
+    build:
+      context: .
+      dockerfile: services/execution-engine/Dockerfile
+    command: ['node', 'dist/server.js']
+    environment:
+      NODE_ENV: production
+      PORT: 5001
+      REDIS_URL: redis://redis:6379
+      EXECUTION_QUEUE_NAME: code-execution
+      DEAD_LETTER_QUEUE_NAME: code-execution-dlq
+    expose:
+      - '5001'
+    depends_on:
+      redis:
+        condition: service_healthy
+
+  execution-worker:
+    build:
+      context: .
+      dockerfile: services/execution-engine/Dockerfile
+    command: ['node', 'dist/index.js']
+    environment:
+      NODE_ENV: production
+      REDIS_URL: redis://redis:6379
+      EXECUTION_QUEUE_NAME: code-execution
+      DEAD_LETTER_QUEUE_NAME: code-execution-dlq
+      WORKER_CONCURRENCY: 4
+      DOCKER_SOCKET_PATH: /var/run/docker.sock
+    volumes:
+      # The worker launches sandbox containers on the host daemon.
+      # In production prefer a rootless/socket-proxy setup over the raw socket.
+      - /var/run/docker.sock:/var/run/docker.sock
+    depends_on:
+      redis:
+        condition: service_healthy
+    deploy:
+      replicas: 2 # scale horizontally for throughput
+
+  socket-service:
+    build:
+      context: .
+      dockerfile: services/socket-service/Dockerfile
+    environment:
+      NODE_ENV: production
+      PORT: 4100
+      REDIS_URL: redis://redis:6379
+      CORS_ORIGIN: ${CORS_ORIGIN:-http://localhost:5173}
+      JWT_ACCESS_SECRET: ${JWT_ACCESS_SECRET:-dev-access-secret-change-me}
+    expose:
+      - '4100'
+    depends_on:
+      redis:
+        condition: service_healthy
+    deploy:
+      replicas: 2 # stateless; Redis adapter unifies them into one logical server
+
+  ai-service:
+    build:
+      context: .
+      dockerfile: services/ai-service/Dockerfile
+    environment:
+      NODE_ENV: production
+      PORT: 5000
+      GEMINI_API_KEY: ${GEMINI_API_KEY:-}
+    expose:
+      - '5000'
+
+  frontend:
+    build:
+      context: .
+      dockerfile: apps/frontend/Dockerfile
+    expose:
+      - '80'
+
+  nginx:
+    image: nginx:1.27-alpine
+    volumes:
+      - ./docker/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+    ports:
+      - '8080:80'
+    depends_on:
+      - frontend
+      - backend
+      - ai-service
+
+volumes:
+  pgdata:
+  redisdata:

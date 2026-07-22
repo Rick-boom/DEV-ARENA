@@ -1,0 +1,6 @@
+# Defines which folders pnpm treats as workspace packages.
+# Any package.json inside these globs becomes linkable via "workspace:*".
+packages:
+  - 'apps/*'
+  - 'packages/*'
+  - 'services/*'

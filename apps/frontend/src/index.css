@@ -1,0 +1,197 @@
+@import 'tailwindcss';
+@import './styles/tokens.css';
+
+/* ── DevArena design tokens ─────────────────────────────────────────
+   Concept: a tournament at night. Two duelists — challenger cyan vs
+   opponent red — with championship gold reserved for rating/victory.
+   The dual accent system encodes the product's core idea (1v1). */
+@theme {
+  --color-ink: #0c0b16;
+  --color-panel: #14121f;
+  --color-panel-2: #1a1730;
+  --color-line: #262239;
+  --color-fg: #efecf9;
+  --color-muted: #8d89a5;
+  --color-cyan: #5ee6ff;
+  --color-red: #ff5d73;
+  --color-gold: #ffc24b;
+  --color-green: #4ade80;
+
+  --font-display: 'Unbounded', sans-serif;
+  --font-sans: 'Instrument Sans', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--color-ink);
+  color: var(--color-fg);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+::selection {
+  background: color-mix(in srgb, var(--color-gold) 35%, transparent);
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-cyan);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+/* Signature: the tilted arena panel */
+.arena-tilt {
+  transform: perspective(1400px) rotateY(-7deg) rotateX(3deg);
+  transition: transform 700ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+.arena-tilt:hover {
+  transform: perspective(1400px) rotateY(-2deg) rotateX(1deg);
+}
+
+/* Verdict stamp slam */
+@keyframes stamp {
+  0% {
+    opacity: 0;
+    transform: scale(2.4) rotate(-14deg);
+  }
+  60% {
+    opacity: 1;
+    transform: scale(0.94) rotate(-8deg);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) rotate(-8deg);
+  }
+}
+.stamp {
+  animation: stamp 320ms cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+/* Caret blink */
+@keyframes caret {
+  0%,
+  49% {
+    opacity: 1;
+  }
+  50%,
+  100% {
+    opacity: 0;
+  }
+}
+.caret::after {
+  content: '';
+  display: inline-block;
+  width: 0.55em;
+  height: 1.05em;
+  margin-left: 1px;
+  vertical-align: text-bottom;
+  background: currentColor;
+  animation: caret 900ms step-end infinite;
+}
+
+/* Slow marquee for the live ticker */
+@keyframes ticker {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+.ticker {
+  animation: ticker 28s linear infinite;
+}
+
+/* Section reveal */
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.rise {
+  animation: rise 700ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .arena-tilt,
+  .arena-tilt:hover {
+    transform: none;
+  }
+  .stamp,
+  .caret::after,
+  .ticker,
+  .rise {
+    animation: none;
+  }
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+/* ── Base layer (shell) ──────────────────────────────────────────── */
+html {
+  color-scheme: dark;
+}
+html.light {
+  color-scheme: light;
+}
+
+body {
+  background: var(--color-canvas);
+  color: var(--color-fg);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* Visible keyboard focus everywhere — non-negotiable accessibility floor. */
+:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Skip link: first tab stop on every page. */
+.skip-link {
+  position: absolute;
+  left: -9999px;
+  z-index: 999;
+}
+.skip-link:focus {
+  left: 1rem;
+  top: 1rem;
+  padding: 0.5rem 0.875rem;
+  background: var(--color-elevated);
+  border: 1px solid var(--color-border-strong);
+  border-radius: 8px;
+}
+
+/* Honour the OS setting — all motion becomes instant. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Hairline grid used behind the auth panel. */
+.grid-hairline {
+  background-image:
+    linear-gradient(to right, var(--color-border) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--color-border) 1px, transparent 1px);
+  background-size: 48px 48px;
+  mask-image: radial-gradient(ellipse 80% 60% at 50% 40%, #000 20%, transparent 75%);
+}

@@ -1,0 +1,582 @@
+{
+  "info": {
+    "name": "DevArena \u2014 Battle Engine",
+    "description": "Competitive battle lifecycle. Set {{baseUrl}} (e.g. http://localhost:4000/api/v1) and {{accessToken}} (JWT). Battle runtime state (Waiting/Countdown/Active/Paused) lives in Redis; durable status is persisted.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:4000/api/v1"
+    },
+    {
+      "key": "accessToken",
+      "value": ""
+    },
+    {
+      "key": "battleId",
+      "value": ""
+    }
+  ],
+  "item": [
+    {
+      "name": "Lifecycle",
+      "item": [
+        {
+          "name": "Create battle",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/battle/create",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "battle",
+                "create"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{accessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "description": "Returns { battle, inviteToken }. Copy battle.id into {{battleId}}.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"type\": \"ONE_VS_ONE\",\n  \"mode\": \"ONE_VS_ONE\",\n  \"problemId\": \"11111111-1111-4111-8111-111111111111\",\n  \"rated\": true,\n  \"isPrivate\": false,\n  \"name\": \"Ranked 1v1\",\n  \"capacity\": 2\n}"
+            }
+          }
+        },
+        {
+          "name": "Join by battleId",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/battle/join",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "battle",
+                "join"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{accessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"battleId\": \"{{battleId}}\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Join by room code",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/battle/join",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "battle",
+                "join"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{accessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"code\": \"ABC123\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Join by invite token",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/battle/join",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "battle",
+                "join"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{accessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"inviteToken\": \"<token-from-create>\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Start countdown (host)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/battle/start",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "battle",
+                "start"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{accessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "description": "WAITING -> COUNTDOWN. Scheduler fires COUNTDOWN -> ACTIVE.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"battleId\": \"{{battleId}}\",\n  \"nonce\": 1\n}"
+            }
+          }
+        },
+        {
+          "name": "Pause (host)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/battle/pause",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "battle",
+                "pause"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{accessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "description": "ACTIVE -> PAUSED. nonce must strictly increase (replay protection).",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"battleId\": \"{{battleId}}\",\n  \"nonce\": 2\n}"
+            }
+          }
+        },
+        {
+          "name": "Resume (host)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/battle/resume",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "battle",
+                "resume"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{accessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "description": "PAUSED -> ACTIVE; deadline extended by paused duration.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"battleId\": \"{{battleId}}\",\n  \"nonce\": 3\n}"
+            }
+          }
+        },
+        {
+          "name": "Finish (host)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/battle/finish",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "battle",
+                "finish"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{accessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "description": "Publishes a rating event; emits winner + battle:end.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"battleId\": \"{{battleId}}\",\n  \"nonce\": 4,\n  \"winnerId\": \"<userId>\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Rematch",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/battle/rematch",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "battle",
+                "rematch"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{accessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "description": "New battle reusing problem + mode.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"battleId\": \"{{battleId}}\"\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Reads",
+      "item": [
+        {
+          "name": "Get battle",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/battle/{{battleId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "battle",
+                "{{battleId}}"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{accessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "description": "Durable status + live runtime state merged."
+          }
+        },
+        {
+          "name": "My history",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/battle/history?page=1&pageSize=20",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "battle",
+                "history?page=1&pageSize=20"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{accessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "Replay timeline",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/battle/{{battleId}}/replay",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "battle",
+                "{{battleId}}",
+                "replay"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{accessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "description": "Ordered event log: state changes + submissions."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Error cases",
+      "item": [
+        {
+          "name": "Join unknown -> BATTLE_NOT_FOUND",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/battle/join",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "battle",
+                "join"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{accessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"battleId\": \"00000000-0000-4000-8000-000000000000\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Duplicate join -> ALREADY_JOINED",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/battle/join",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "battle",
+                "join"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{accessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"battleId\": \"{{battleId}}\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Non-host start -> NOT_HOST",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/battle/start",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "battle",
+                "start"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{accessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"battleId\": \"{{battleId}}\",\n  \"nonce\": 1\n}"
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

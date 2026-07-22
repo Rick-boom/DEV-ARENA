@@ -1,0 +1,769 @@
+// ═══════════════════════════════════════════════════════════════════
+// DevArena — Database Schema
+// PostgreSQL + Prisma
+//
+// Conventions
+//   • UUID primary keys (app-generated, shard-friendly, non-guessable)
+//   • createdAt/updatedAt on every mutable model
+//   • Soft delete (deletedAt) only where history must survive:
+//     User, Problem, Room. Everything else hard-deletes or cascades.
+//   • onDelete: Cascade  → child data is meaningless without parent
+//   • onDelete: Restrict → parent must never disappear under children
+//     (problems under submissions, users under rating history)
+//   • Named relations wherever a model relates to User twice+
+// ═══════════════════════════════════════════════════════════════════
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ─────────────────────────── ENUMS ─────────────────────────────────
+
+enum Role {
+  USER
+  PREMIUM
+  MODERATOR
+  ADMIN
+}
+
+enum Difficulty {
+  EASY
+  MEDIUM
+  HARD
+}
+
+enum Language {
+  JAVASCRIPT
+  TYPESCRIPT
+  PYTHON
+  CPP
+  JAVA
+}
+
+enum ProblemVisibility {
+  DRAFT // author/admin only
+  PUBLIC // everyone
+  PREMIUM // premium subscribers
+  ARCHIVED // hidden from lists, reachable by direct link for history
+}
+
+enum SubmissionStatus {
+  PENDING // persisted, not yet queued
+  QUEUED // in BullMQ
+  RUNNING // inside sandbox
+  ACCEPTED
+  WRONG_ANSWER
+  TIME_LIMIT_EXCEEDED
+  MEMORY_LIMIT_EXCEEDED
+  RUNTIME_ERROR
+  COMPILATION_ERROR
+  OUTPUT_LIMIT_EXCEEDED // judge: stdout exceeded the output ceiling
+  PRESENTATION_ERROR // judge: correct tokens, wrong formatting/whitespace
+  SKIPPED // judge: not run (earlier test failed under stop-on-first-fail)
+  INTERNAL_ERROR // judge-side failure — never blame the user
+}
+
+enum RoomType {
+  BATTLE
+  COLLABORATION
+  INTERVIEW
+}
+
+enum RoomStatus {
+  WAITING // lobby open, host can start
+  ACTIVE
+  COMPLETED
+  CANCELLED
+}
+
+enum BattleMode {
+  ONE_VS_ONE
+  FREE_FOR_ALL
+  TEAM
+}
+
+enum BattleStatus {
+  SCHEDULED
+  IN_PROGRESS
+  FINISHED
+  ABORTED
+}
+
+enum LeaderboardScope {
+  GLOBAL
+  WEEKLY
+  MONTHLY
+}
+
+enum NotificationType {
+  FRIEND_REQUEST
+  FRIEND_ACCEPTED
+  BATTLE_INVITE
+  ROOM_INVITE
+  BATTLE_RESULT
+  ACHIEVEMENT_UNLOCKED
+  SUBMISSION_RESULT
+  SYSTEM
+}
+
+enum AchievementType {
+  SOLVE_COUNT // solve N problems
+  STREAK // N-day activity streak
+  BATTLE_WINS // win N battles
+  RATING // reach rating R
+  SPECIAL // manually granted / event
+}
+
+enum FriendRequestStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+  CANCELLED
+}
+
+// ─────────────────────── IDENTITY & ACCESS ─────────────────────────
+
+/// Core identity. passwordHash is nullable because OAuth-only users
+/// never set a password. rating is denormalized here (hot read on
+/// every profile/leaderboard render); RatingHistory holds the audit
+/// trail. Soft-deleted users keep submissions/battles consistent.
+model User {
+  id           String    @id @default(uuid()) @db.Uuid
+  username     String    @unique @db.VarChar(32)
+  email        String    @unique @db.VarChar(255)
+  passwordHash String?   @db.VarChar(255)
+  role         Role      @default(USER)
+  rating       Int       @default(1200)
+  avatarUrl    String?   @db.VarChar(512)
+  bio          String?   @db.VarChar(500)
+  country      String?   @db.VarChar(2) // ISO 3166-1 alpha-2
+  isVerified   Boolean   @default(false)
+  lastActiveAt DateTime?
+  deletedAt    DateTime?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  sessions               Session[]
+  accounts               Account[]
+  authoredProblems       Problem[]           @relation("ProblemAuthor")
+  submissions            Submission[]
+  hostedRooms            Room[]              @relation("RoomHost")
+  roomParticipations     RoomParticipant[]
+  battleParticipations   BattleParticipant[]
+  wonBattles             Battle[]            @relation("BattleWinner")
+  leaderboardEntries     Leaderboard[]
+  ratingHistory          RatingHistory[]
+  achievements           UserAchievement[]
+  bookmarks              Bookmark[]
+  notifications          Notification[]
+  sentFriendRequests     FriendRequest[]     @relation("FriendRequestSender")
+  receivedFriendRequests FriendRequest[]     @relation("FriendRequestReceiver")
+  activities             Activity[]
+  analytics              Analytics[]
+  adminLogs              AdminLog[]          @relation("AdminActor")
+
+  @@index([rating(sort: Desc)]) // global ranking scans
+  @@index([deletedAt]) // filter live users cheaply
+  @@index([createdAt])
+  @@map("users")
+}
+
+/// One row per device login. The refresh token itself is never stored —
+/// only its SHA-256 hash — so a DB leak cannot mint sessions.
+/// revokedAt supports "logout all devices" without deleting audit data.
+model Session {
+  id               String    @id @default(uuid()) @db.Uuid
+  userId           String    @db.Uuid
+  refreshTokenHash String    @unique @db.VarChar(64)
+  userAgent        String?   @db.VarChar(512)
+  ipAddress        String?   @db.VarChar(45) // IPv6-safe
+  expiresAt        DateTime
+  revokedAt        DateTime?
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, expiresAt]) // "my active sessions" + expiry sweeper
+  @@map("sessions")
+}
+
+/// Links a User to an external OAuth identity (google/github).
+/// One user may link many providers; one provider identity maps to
+/// exactly one user — enforced by the composite unique.
+model Account {
+  id                String    @id @default(uuid()) @db.Uuid
+  userId            String    @db.Uuid
+  provider          String    @db.VarChar(32)
+  providerAccountId String    @db.VarChar(255)
+  accessToken       String?   @db.Text // provider token if we call their APIs
+  refreshToken      String?   @db.Text
+  expiresAt         DateTime?
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@index([userId])
+  @@map("accounts")
+}
+
+// ────────────────────────── PROBLEMS ───────────────────────────────
+
+/// The canonical problem document. Statement is markdown. solvedCount /
+/// submissionCount are denormalized counters (updated transactionally
+/// by the judge) so list pages never aggregate the submissions table.
+/// version supports optimistic locking for concurrent admin edits.
+model Problem {
+  id              String            @id @default(uuid()) @db.Uuid
+  slug            String            @unique @db.VarChar(128) // SEO/router key
+  title           String            @db.VarChar(200)
+  statement       String            @db.Text
+  difficulty      Difficulty
+  visibility      ProblemVisibility @default(DRAFT)
+  timeLimitMs     Int               @default(2000)
+  memoryLimitMb   Int               @default(256)
+  solvedCount     Int               @default(0)
+  submissionCount Int               @default(0)
+  authorId        String?           @db.Uuid
+  version         Int               @default(1) // optimistic lock
+  deletedAt       DateTime?
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+
+  author      User?               @relation("ProblemAuthor", fields: [authorId], references: [id], onDelete: SetNull)
+  tags        ProblemTag[]
+  examples    ProblemExample[]
+  constraints ProblemConstraint[]
+  hints       ProblemHint[]
+  editorial   ProblemEditorial?
+  testCases   TestCase[]
+  submissions Submission[]
+  battles     Battle[]
+  bookmarks   Bookmark[]
+  companies   ProblemCompany[]
+  versions    ProblemVersion[]
+
+  @@index([visibility, difficulty]) // main list filter combo
+  @@index([visibility, createdAt(sort: Desc)]) // "newest" listing
+  @@index([deletedAt])
+  @@map("problems")
+}
+
+/// Normalized tag vocabulary ("two-pointers", "dp"). Own table so a
+/// rename touches one row and tag pages are a single lookup.
+model Tag {
+  id        String   @id @default(uuid()) @db.Uuid
+  name      String   @unique @db.VarChar(64)
+  slug      String   @unique @db.VarChar(64)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  problems ProblemTag[]
+
+  @@map("tags")
+}
+
+/// Explicit M:N join between Problem and Tag. Explicit (not implicit)
+/// so both directions are indexed and metadata (e.g. relevance weight)
+/// can be added later without rewriting the join table.
+model ProblemTag {
+  problemId String   @db.Uuid
+  tagId     String   @db.Uuid
+  createdAt DateTime @default(now())
+
+  problem Problem @relation(fields: [problemId], references: [id], onDelete: Cascade)
+  tag     Tag     @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@id([problemId, tagId])
+  @@index([tagId]) // "all problems with tag X"
+  @@map("problem_tags")
+}
+
+/// Company vocabulary ("google", "amazon") for the interview-prep
+/// filter. Mirrors Tag exactly: normalized so renames touch one row
+/// and company pages are a single indexed lookup.
+model Company {
+  id        String   @id @default(uuid()) @db.Uuid
+  name      String   @unique @db.VarChar(64)
+  slug      String   @unique @db.VarChar(64)
+  logoUrl   String?  @db.VarChar(512)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  problems ProblemCompany[]
+
+  @@map("companies")
+}
+
+/// Explicit M:N join between Problem and Company, same shape and
+/// rationale as ProblemTag (both directions indexed, metadata-ready).
+model ProblemCompany {
+  problemId String   @db.Uuid
+  companyId String   @db.Uuid
+  createdAt DateTime @default(now())
+
+  problem Problem @relation(fields: [problemId], references: [id], onDelete: Cascade)
+  company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@id([problemId, companyId])
+  @@index([companyId]) // "all problems asked at company X"
+  @@map("problem_companies")
+}
+
+/// Append-only snapshot written inside the same transaction as every
+/// admin update. Problem.version is the optimistic lock counter; this
+/// table is the actual history (diff view, rollback, audit). snapshot
+/// is Json because it is written once, read rarely, never queried
+/// relationally.
+model ProblemVersion {
+  id        String   @id @default(uuid()) @db.Uuid
+  problemId String   @db.Uuid
+  version   Int
+  snapshot  Json
+  editorId  String?  @db.Uuid
+  createdAt DateTime @default(now())
+
+  problem Problem @relation(fields: [problemId], references: [id], onDelete: Cascade)
+
+  @@unique([problemId, version])
+  @@index([problemId, createdAt(sort: Desc)])
+  @@map("problem_versions")
+}
+
+/// Worked examples shown in the statement. Separate rows, not a JSON
+/// blob: individually editable, ordered, constrained.
+model ProblemExample {
+  id          String   @id @default(uuid()) @db.Uuid
+  problemId   String   @db.Uuid
+  input       String   @db.Text
+  output      String   @db.Text
+  explanation String?  @db.Text
+  order       Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  problem Problem @relation(fields: [problemId], references: [id], onDelete: Cascade)
+
+  @@unique([problemId, order])
+  @@map("problem_examples")
+}
+
+/// Constraint lines ("1 ≤ n ≤ 10^5"). Own table for ordering and
+/// per-line admin edits.
+model ProblemConstraint {
+  id          String   @id @default(uuid()) @db.Uuid
+  problemId   String   @db.Uuid
+  description String   @db.VarChar(500)
+  order       Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  problem Problem @relation(fields: [problemId], references: [id], onDelete: Cascade)
+
+  @@unique([problemId, order])
+  @@map("problem_constraints")
+}
+
+/// Progressive hints. `order` is the reveal sequence; the AI coach
+/// and the UI both unlock them one at a time.
+model ProblemHint {
+  id        String   @id @default(uuid()) @db.Uuid
+  problemId String   @db.Uuid
+  content   String   @db.Text
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  problem Problem @relation(fields: [problemId], references: [id], onDelete: Cascade)
+
+  @@unique([problemId, order])
+  @@map("problem_hints")
+}
+
+/// Official solution write-up. Strict 1:1 (unique problemId) — a
+/// problem has at most one editorial; premium gating happens in the
+/// service layer using Problem.visibility + User.role.
+model ProblemEditorial {
+  id              String   @id @default(uuid()) @db.Uuid
+  problemId       String   @unique @db.Uuid
+  content         String   @db.Text
+  timeComplexity  String?  @db.VarChar(64)
+  spaceComplexity String?  @db.VarChar(64)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  problem Problem @relation(fields: [problemId], references: [id], onDelete: Cascade)
+
+  @@map("problem_editorials")
+}
+
+/// Judge inputs. isHidden separates sample tests (shown in UI) from
+/// the private set. weight enables partial scoring later. The judge
+/// reads (problemId, isHidden, order) — exactly the composite index.
+model TestCase {
+  id             String   @id @default(uuid()) @db.Uuid
+  problemId      String   @db.Uuid
+  input          String   @db.Text
+  expectedOutput String   @db.Text
+  isHidden       Boolean  @default(true)
+  weight         Int      @default(1)
+  order          Int      @default(0)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  problem Problem            @relation(fields: [problemId], references: [id], onDelete: Cascade)
+  results SubmissionResult[]
+
+  @@unique([problemId, order])
+  @@index([problemId, isHidden])
+  @@map("test_cases")
+}
+
+// ───────────────────────── SUBMISSIONS ─────────────────────────────
+
+/// One judged attempt. Problem/User use Restrict + soft delete above
+/// so history never dangles. battleId is nullable: the same pipeline
+/// serves practice and battle submissions. This is the largest table
+/// in the system — every index below maps to a hot query, nothing more.
+model Submission {
+  id        String           @id @default(uuid()) @db.Uuid
+  userId    String           @db.Uuid
+  problemId String           @db.Uuid
+  battleId  String?          @db.Uuid
+  language  Language
+  code      String           @db.Text
+  status    SubmissionStatus @default(PENDING)
+  runtimeMs Int?
+  memoryKb  Int?
+  createdAt DateTime         @default(now())
+  updatedAt DateTime         @updatedAt
+
+  user    User               @relation(fields: [userId], references: [id], onDelete: Restrict)
+  problem Problem            @relation(fields: [problemId], references: [id], onDelete: Restrict)
+  battle  Battle?            @relation(fields: [battleId], references: [id], onDelete: SetNull)
+  results SubmissionResult[]
+
+  @@index([userId, createdAt(sort: Desc)]) // profile history feed
+  @@index([problemId, status]) // acceptance stats
+  @@index([userId, problemId, status]) // "has user solved X?"
+  @@index([battleId]) // battle scoreboard
+  @@index([status, createdAt]) // judge queue recovery
+  @@map("submissions")
+}
+
+/// Per-test-case verdict for a submission. Kept separate from
+/// Submission so the row stays small and the UI can stream results
+/// test-by-test. stderr is truncated at write time by the service.
+model SubmissionResult {
+  id           String           @id @default(uuid()) @db.Uuid
+  submissionId String           @db.Uuid
+  testCaseId   String           @db.Uuid
+  status       SubmissionStatus
+  runtimeMs    Int?
+  memoryKb     Int?
+  stderr       String?          @db.VarChar(2000)
+  createdAt    DateTime         @default(now())
+
+  submission Submission @relation(fields: [submissionId], references: [id], onDelete: Cascade)
+  testCase   TestCase   @relation(fields: [testCaseId], references: [id], onDelete: Cascade)
+
+  @@unique([submissionId, testCaseId])
+  @@map("submission_results")
+}
+
+// ─────────────────────── ROOMS & BATTLES ───────────────────────────
+
+/// A real-time space (battle lobby, collab session, interview).
+/// `code` is the short shareable join code. settings is Json because
+/// per-type knobs (battle timer, collab language, interview rubric)
+/// vary by RoomType and none are queried relationally.
+model Room {
+  id              String     @id @default(uuid()) @db.Uuid
+  code            String     @unique @db.VarChar(10)
+  name            String     @db.VarChar(100)
+  type            RoomType
+  status          RoomStatus @default(WAITING)
+  hostId          String     @db.Uuid
+  maxParticipants Int        @default(2)
+  isPrivate       Boolean    @default(false)
+  settings        Json       @default("{}")
+  deletedAt       DateTime?
+  createdAt       DateTime   @default(now())
+  updatedAt       DateTime   @updatedAt
+
+  host         User              @relation("RoomHost", fields: [hostId], references: [id], onDelete: Restrict)
+  participants RoomParticipant[]
+  battle       Battle?
+
+  @@index([status, type]) // public lobby browser
+  @@index([hostId])
+  @@map("rooms")
+}
+
+/// Membership + presence history for a room. leftAt nullable = still
+/// inside. Unique (roomId, userId) prevents double-join at the DB
+/// level even under socket race conditions.
+model RoomParticipant {
+  id       String    @id @default(uuid()) @db.Uuid
+  roomId   String    @db.Uuid
+  userId   String    @db.Uuid
+  joinedAt DateTime  @default(now())
+  leftAt   DateTime?
+
+  room Room @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([roomId, userId])
+  @@index([userId]) // "rooms I'm in"
+  @@map("room_participants")
+}
+
+/// Competitive match inside a BATTLE room (1:1 via unique roomId).
+/// problemId Restrict: a problem used in past battles can be archived
+/// (visibility) but never hard-deleted. winnerId SetNull keeps the
+/// battle record if the winner deletes their account.
+model Battle {
+  id        String       @id @default(uuid()) @db.Uuid
+  roomId    String       @unique @db.Uuid
+  problemId String       @db.Uuid
+  mode      BattleMode   @default(ONE_VS_ONE)
+  status    BattleStatus @default(SCHEDULED)
+  rated     Boolean      @default(true)
+  startedAt DateTime?
+  endedAt   DateTime?
+  winnerId  String?      @db.Uuid
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+
+  room         Room                @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  problem      Problem             @relation(fields: [problemId], references: [id], onDelete: Restrict)
+  winner       User?               @relation("BattleWinner", fields: [winnerId], references: [id], onDelete: SetNull)
+  participants BattleParticipant[]
+  submissions  Submission[]
+  ratingEvents RatingHistory[]
+
+  @@index([status, createdAt(sort: Desc)]) // live/recent battles feed
+  @@index([problemId])
+  @@map("battles")
+}
+
+/// Per-player battle outcome. ratingBefore/After are frozen here so
+/// historical battle pages never recompute Elo from scratch.
+model BattleParticipant {
+  id           String   @id @default(uuid()) @db.Uuid
+  battleId     String   @db.Uuid
+  userId       String   @db.Uuid
+  score        Int      @default(0)
+  rank         Int?
+  ratingBefore Int?
+  ratingAfter  Int?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  battle Battle @relation(fields: [battleId], references: [id], onDelete: Cascade)
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([battleId, userId])
+  @@index([userId, createdAt(sort: Desc)]) // user's battle history
+  @@map("battle_participants")
+}
+
+// ──────────────────── RANKING & PROGRESSION ────────────────────────
+
+/// Persisted leaderboard snapshots. Live ranking is served from Redis
+/// sorted sets; this table is the durable record per (scope, period)
+/// — e.g. (WEEKLY, "2026-W29") — for history pages and Redis rebuilds.
+model Leaderboard {
+  id        String           @id @default(uuid()) @db.Uuid
+  userId    String           @db.Uuid
+  scope     LeaderboardScope
+  period    String           @db.VarChar(16) // "all" | "2026-W29" | "2026-07"
+  score     Int
+  rank      Int
+  createdAt DateTime         @default(now())
+  updatedAt DateTime         @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([scope, period, userId])
+  @@index([scope, period, rank]) // paginated board read = pure index scan
+  @@map("leaderboards")
+}
+
+/// Append-only Elo audit trail. User Restrict: rating events must
+/// survive as long as the (soft-deleted) user row does.
+model RatingHistory {
+  id        String   @id @default(uuid()) @db.Uuid
+  userId    String   @db.Uuid
+  battleId  String?  @db.Uuid
+  oldRating Int
+  newRating Int
+  change    Int
+  reason    String   @db.VarChar(100) // "battle_win", "seasonal_decay"...
+  createdAt DateTime @default(now())
+
+  user   User    @relation(fields: [userId], references: [id], onDelete: Restrict)
+  battle Battle? @relation(fields: [battleId], references: [id], onDelete: SetNull)
+
+  @@index([userId, createdAt(sort: Desc)]) // rating graph query
+  @@map("rating_history")
+}
+
+/// Achievement catalog. `code` is the stable machine key referenced in
+/// service logic; threshold parameterizes the rule per type.
+model Achievement {
+  id          String          @id @default(uuid()) @db.Uuid
+  code        String          @unique @db.VarChar(64)
+  name        String          @db.VarChar(100)
+  description String          @db.VarChar(300)
+  type        AchievementType
+  threshold   Int             @default(1)
+  iconUrl     String?         @db.VarChar(512)
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+
+  users UserAchievement[]
+
+  @@map("achievements")
+}
+
+/// Unlock join table. Composite unique = a badge can be earned once.
+model UserAchievement {
+  id            String   @id @default(uuid()) @db.Uuid
+  userId        String   @db.Uuid
+  achievementId String   @db.Uuid
+  unlockedAt    DateTime @default(now())
+
+  user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  achievement Achievement @relation(fields: [achievementId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, achievementId])
+  @@index([userId, unlockedAt(sort: Desc)])
+  @@map("user_achievements")
+}
+
+// ─────────────────────────── SOCIAL ────────────────────────────────
+
+/// Saved problems. Pure join table; composite PK, no surrogate needed.
+model Bookmark {
+  userId    String   @db.Uuid
+  problemId String   @db.Uuid
+  createdAt DateTime @default(now())
+
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  problem Problem @relation(fields: [problemId], references: [id], onDelete: Cascade)
+
+  @@id([userId, problemId])
+  @@index([problemId]) // "how many bookmarked this problem"
+  @@map("bookmarks")
+}
+
+/// Directed friend edge with lifecycle status. Unique (sender,
+/// receiver) blocks duplicate requests; the service layer also checks
+/// the reverse direction before insert. ACCEPTED rows ARE the
+/// friendship — no second table to keep in sync.
+model FriendRequest {
+  id         String              @id @default(uuid()) @db.Uuid
+  senderId   String              @db.Uuid
+  receiverId String              @db.Uuid
+  status     FriendRequestStatus @default(PENDING)
+  createdAt  DateTime            @default(now())
+  updatedAt  DateTime            @updatedAt
+
+  sender   User @relation("FriendRequestSender", fields: [senderId], references: [id], onDelete: Cascade)
+  receiver User @relation("FriendRequestReceiver", fields: [receiverId], references: [id], onDelete: Cascade)
+
+  @@unique([senderId, receiverId])
+  @@index([receiverId, status]) // inbox: pending requests for me
+  @@index([senderId, status])
+  @@map("friend_requests")
+}
+
+/// In-app notification. data Json carries type-specific payload
+/// (battleId, senderId, ...) — rendered by type on the client, never
+/// queried relationally. readAt nullable = unread.
+model Notification {
+  id        String           @id @default(uuid()) @db.Uuid
+  userId    String           @db.Uuid
+  type      NotificationType
+  title     String           @db.VarChar(150)
+  body      String           @db.VarChar(500)
+  data      Json             @default("{}")
+  readAt    DateTime?
+  createdAt DateTime         @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, readAt, createdAt(sort: Desc)]) // unread badge + feed
+  @@map("notifications")
+}
+
+// ──────────────────── TELEMETRY & GOVERNANCE ───────────────────────
+
+/// Append-only user activity stream ("solved_problem", "joined_room").
+/// Powers the profile heatmap and feeds Analytics aggregation.
+/// Partition-by-month candidate once volume demands it.
+model Activity {
+  id        String   @id @default(uuid()) @db.Uuid
+  userId    String   @db.Uuid
+  action    String   @db.VarChar(64)
+  metadata  Json     @default("{}")
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt(sort: Desc)])
+  @@index([action, createdAt]) // platform-wide action counts
+  @@map("activities")
+}
+
+/// One pre-aggregated row per user per day. Dashboards read this tiny
+/// table instead of scanning millions of submissions — the classic
+/// OLTP/rollup split. Unique (userId, date) makes the nightly job
+/// idempotent (upsert).
+model Analytics {
+  id               String   @id @default(uuid()) @db.Uuid
+  userId           String   @db.Uuid
+  date             DateTime @db.Date
+  problemsSolved   Int      @default(0)
+  submissionsCount Int      @default(0)
+  battlesPlayed    Int      @default(0)
+  battlesWon       Int      @default(0)
+  activeMinutes    Int      @default(0)
+  streakDays       Int      @default(0)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, date])
+  @@index([date]) // "platform stats on day D"
+  @@map("analytics")
+}
+
+/// Immutable audit log of privileged actions (problem edits, bans,
+/// role changes). actor Restrict — an admin account can be soft-
+/// deleted but its audit trail is permanent. Required by the security
+/// (auth) milestone's audit requirements.
+model AdminLog {
+  id         String   @id @default(uuid()) @db.Uuid
+  actorId    String   @db.Uuid
+  action     String   @db.VarChar(64) // "problem.publish", "user.ban"
+  targetType String   @db.VarChar(64) // "problem" | "user" | ...
+  targetId   String?  @db.VarChar(64)
+  metadata   Json     @default("{}")
+  createdAt  DateTime @default(now())
+
+  actor User @relation("AdminActor", fields: [actorId], references: [id], onDelete: Restrict)
+
+  @@index([actorId, createdAt(sort: Desc)])
+  @@index([targetType, targetId]) // "everything done to problem X"
+  @@map("admin_logs")
+}

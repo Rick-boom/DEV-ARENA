@@ -1,0 +1,45 @@
+{
+  "name": "@devarena/execution-engine",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Production-grade remote code execution engine: sandboxed Docker runner behind a BullMQ queue. API + worker.",
+  "type": "module",
+  "scripts": {
+    "dev:api": "tsx watch src/server.ts",
+    "dev:worker": "tsx watch src/index.ts",
+    "build": "tsc -p tsconfig.json",
+    "start:api": "node dist/server.js",
+    "start:worker": "node dist/index.js",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "lint": "eslint src",
+    "test": "vitest run",
+    "build:images": "bash scripts/build-images.sh"
+  },
+  "dependencies": {
+    "@devarena/shared-types": "workspace:*",
+    "@devarena/shared-utils": "workspace:*",
+    "bullmq": "^5.34.0",
+    "cors": "^2.8.5",
+    "dockerode": "^5.0.1",
+    "express": "^4.21.2",
+    "helmet": "^8.0.0",
+    "ioredis": "^5.4.2",
+    "pino": "^10.3.1",
+    "swagger-ui-express": "^5.0.1",
+    "zod": "^3.24.1"
+  },
+  "devDependencies": {
+    "@devarena/eslint-config": "workspace:*",
+    "@devarena/ts-config": "workspace:*",
+    "@types/cors": "^2.8.17",
+    "@types/dockerode": "^4.0.1",
+    "@types/express": "^5.0.0",
+    "@types/node": "^22.10.2",
+    "@types/swagger-ui-express": "^4.1.8",
+    "eslint": "^9.17.0",
+    "pino-pretty": "^13.1.3",
+    "tsx": "^4.23.1",
+    "typescript": "^5.7.2",
+    "vitest": "^4.1.10"
+  }
+}

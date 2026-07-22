@@ -1,0 +1,650 @@
+{
+  "info": {
+    "name": "DevArena \u2014 Matchmaking & Leaderboard",
+    "description": "Redis-backed matchmaking + live leaderboards. Set {{baseUrl}} (e.g. http://localhost:4000/api/v1) and {{accessToken}} (JWT). Queue join is async (202) \u2014 the actual pairing arrives over the socket as match:found once the sweep finds an opponent.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:4000/api/v1"
+    },
+    {
+      "key": "accessToken",
+      "value": ""
+    },
+    {
+      "key": "friendId",
+      "value": ""
+    }
+  ],
+  "item": [
+    {
+      "name": "Queue",
+      "item": [
+        {
+          "name": "Join queue (ranked 1v1)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/queue/join",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "queue",
+                "join"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{accessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "description": "202 Accepted with your ticket. The matcher pairs you asynchronously; listen for match:found on the socket.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"mode\": \"ONE_VS_ONE\",\n  \"region\": \"GLOBAL\",\n  \"language\": \"javascript\",\n  \"skill\": \"ANY\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Join queue (skill = SIMILAR, tight window)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/queue/join",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "queue",
+                "join"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{accessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "description": "SIMILAR halves the rating window for closer matches.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"mode\": \"RANKED\",\n  \"region\": \"EU\",\n  \"language\": \"python\",\n  \"skill\": \"SIMILAR\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Friend match (private)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/queue/join",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "queue",
+                "join"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{accessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "description": "Only pairs with the named friend if they're also queued.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"mode\": \"ONE_VS_ONE\",\n  \"region\": \"GLOBAL\",\n  \"language\": \"cpp\",\n  \"skill\": \"ANY\",\n  \"friendId\": \"{{friendId}}\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Private match by code",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/queue/join",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "queue",
+                "join"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{accessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "description": "Only pairs with another ticket carrying the same privateCode.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"mode\": \"ONE_VS_ONE\",\n  \"region\": \"GLOBAL\",\n  \"language\": \"javascript\",\n  \"skill\": \"ANY\",\n  \"privateCode\": \"ROOM42\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Leave queue",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/queue/leave",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "queue",
+                "leave"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{accessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "description": "404 NOT_QUEUED if you weren't queued."
+          }
+        },
+        {
+          "name": "Queue status",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/queue/status",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "queue",
+                "status"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{accessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "description": "Returns { queued, ticket }."
+          }
+        },
+        {
+          "name": "Reconnect (flush missed matches)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/queue/reconnect",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "queue",
+                "reconnect"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{accessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "description": "Delivers any match:found that arrived while you were briefly offline."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Leaderboard",
+      "item": [
+        {
+          "name": "Board (generic, by scope + period)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/leaderboard?scope=GLOBAL&period=ALL_TIME&page=1&pageSize=50",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "leaderboard"
+              ],
+              "query": [
+                {
+                  "key": "scope",
+                  "value": "GLOBAL",
+                  "description": "GLOBAL|COUNTRY|COLLEGE|FRIENDS"
+                },
+                {
+                  "key": "period",
+                  "value": "ALL_TIME",
+                  "description": "WEEKLY|MONTHLY|ALL_TIME"
+                },
+                {
+                  "key": "page",
+                  "value": "1",
+                  "description": ""
+                },
+                {
+                  "key": "pageSize",
+                  "value": "50",
+                  "description": ""
+                }
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{accessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "description": "scope \u2208 GLOBAL|COUNTRY|COLLEGE|FRIENDS; period \u2208 WEEKLY|MONTHLY|ALL_TIME."
+          }
+        },
+        {
+          "name": "Country board",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/leaderboard?scope=COUNTRY&country=US&period=WEEKLY&page=1&pageSize=25",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "leaderboard"
+              ],
+              "query": [
+                {
+                  "key": "scope",
+                  "value": "COUNTRY",
+                  "description": ""
+                },
+                {
+                  "key": "country",
+                  "value": "US",
+                  "description": ""
+                },
+                {
+                  "key": "period",
+                  "value": "WEEKLY",
+                  "description": ""
+                },
+                {
+                  "key": "page",
+                  "value": "1",
+                  "description": ""
+                },
+                {
+                  "key": "pageSize",
+                  "value": "25",
+                  "description": ""
+                }
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{accessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "description": "Pass country (ISO alpha-2) or it's resolved from your profile."
+          }
+        },
+        {
+          "name": "Global board (shortcut)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/leaderboard/global?period=MONTHLY&page=1&pageSize=50",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "leaderboard",
+                "global"
+              ],
+              "query": [
+                {
+                  "key": "period",
+                  "value": "MONTHLY",
+                  "description": ""
+                },
+                {
+                  "key": "page",
+                  "value": "1",
+                  "description": ""
+                },
+                {
+                  "key": "pageSize",
+                  "value": "50",
+                  "description": ""
+                }
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{accessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "Friends board",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/leaderboard/friends?period=ALL_TIME&page=1&pageSize=50",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "leaderboard",
+                "friends"
+              ],
+              "query": [
+                {
+                  "key": "period",
+                  "value": "ALL_TIME",
+                  "description": ""
+                },
+                {
+                  "key": "page",
+                  "value": "1",
+                  "description": ""
+                },
+                {
+                  "key": "pageSize",
+                  "value": "50",
+                  "description": ""
+                }
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{accessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "description": "Ranks you against your accepted friends."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Rating",
+      "item": [
+        {
+          "name": "Rating history + stats",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/rating/history?limit=50",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "rating",
+                "history"
+              ],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "50",
+                  "description": ""
+                }
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{accessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "description": "Returns { stats: { current, peak, winStreak, lossStreak, games, wins, losses }, history: [...] }."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Error cases",
+      "item": [
+        {
+          "name": "Duplicate join -> ALREADY_QUEUED",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/queue/join",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "queue",
+                "join"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{accessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "description": "409 if already queued.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"mode\": \"ONE_VS_ONE\",\n  \"region\": \"GLOBAL\",\n  \"language\": \"javascript\",\n  \"skill\": \"ANY\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Leave when not queued -> NOT_QUEUED",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/queue/leave",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "queue",
+                "leave"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{accessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "description": "404."
+          }
+        },
+        {
+          "name": "Hammer join -> RATE_LIMITED",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/queue/join",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "queue",
+                "join"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{accessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "description": "429 after >5 joins in the window.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"mode\": \"ONE_VS_ONE\",\n  \"region\": \"GLOBAL\",\n  \"language\": \"javascript\",\n  \"skill\": \"ANY\"\n}"
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

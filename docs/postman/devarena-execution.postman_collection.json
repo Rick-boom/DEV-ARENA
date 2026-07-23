@@ -26,12 +26,8 @@
             ],
             "url": {
               "raw": "{{execBaseUrl}}/health",
-              "host": [
-                "{{execBaseUrl}}"
-              ],
-              "path": [
-                "health"
-              ]
+              "host": ["{{execBaseUrl}}"],
+              "path": ["health"]
             },
             "description": "Liveness probe; returns live BullMQ job counts."
           }
@@ -53,12 +49,8 @@
             ],
             "url": {
               "raw": "{{execBaseUrl}}/execute",
-              "host": [
-                "{{execBaseUrl}}"
-              ],
-              "path": [
-                "execute"
-              ]
+              "host": ["{{execBaseUrl}}"],
+              "path": ["execute"]
             },
             "description": "Reads two ints from stdin, prints their sum. Expect status ACCEPTED, stdout \"9\".",
             "body": {
@@ -79,12 +71,8 @@
             ],
             "url": {
               "raw": "{{execBaseUrl}}/execute",
-              "host": [
-                "{{execBaseUrl}}"
-              ],
-              "path": [
-                "execute"
-              ]
+              "host": ["{{execBaseUrl}}"],
+              "path": ["execute"]
             },
             "description": "",
             "body": {
@@ -105,12 +93,8 @@
             ],
             "url": {
               "raw": "{{execBaseUrl}}/execute",
-              "host": [
-                "{{execBaseUrl}}"
-              ],
-              "path": [
-                "execute"
-              ]
+              "host": ["{{execBaseUrl}}"],
+              "path": ["execute"]
             },
             "description": "Exercises the compile\u2192run path.",
             "body": {
@@ -131,12 +115,8 @@
             ],
             "url": {
               "raw": "{{execBaseUrl}}/execute",
-              "host": [
-                "{{execBaseUrl}}"
-              ],
-              "path": [
-                "execute"
-              ]
+              "host": ["{{execBaseUrl}}"],
+              "path": ["execute"]
             },
             "description": "",
             "body": {
@@ -157,12 +137,8 @@
             ],
             "url": {
               "raw": "{{execBaseUrl}}/execute",
-              "host": [
-                "{{execBaseUrl}}"
-              ],
-              "path": [
-                "execute"
-              ]
+              "host": ["{{execBaseUrl}}"],
+              "path": ["execute"]
             },
             "description": "Expect status COMPILATION_ERROR with compiler stderr in the result.",
             "body": {
@@ -183,12 +159,8 @@
             ],
             "url": {
               "raw": "{{execBaseUrl}}/execute",
-              "host": [
-                "{{execBaseUrl}}"
-              ],
-              "path": [
-                "execute"
-              ]
+              "host": ["{{execBaseUrl}}"],
+              "path": ["execute"]
             },
             "description": "Non-zero exit \u2192 status RUNTIME_ERROR.",
             "body": {
@@ -209,12 +181,8 @@
             ],
             "url": {
               "raw": "{{execBaseUrl}}/execute",
-              "host": [
-                "{{execBaseUrl}}"
-              ],
-              "path": [
-                "execute"
-              ]
+              "host": ["{{execBaseUrl}}"],
+              "path": ["execute"]
             },
             "description": "Infinite loop; the watchdog force-kills the container. Expect TIME_LIMIT_EXCEEDED.",
             "body": {
@@ -235,12 +203,8 @@
             ],
             "url": {
               "raw": "{{execBaseUrl}}/execute",
-              "host": [
-                "{{execBaseUrl}}"
-              ],
-              "path": [
-                "execute"
-              ]
+              "host": ["{{execBaseUrl}}"],
+              "path": ["execute"]
             },
             "description": "Allocates past the cap; OOM kill \u2192 MEMORY_LIMIT_EXCEEDED.",
             "body": {
@@ -261,12 +225,8 @@
             ],
             "url": {
               "raw": "{{execBaseUrl}}/execute",
-              "host": [
-                "{{execBaseUrl}}"
-              ],
-              "path": [
-                "execute"
-              ]
+              "host": ["{{execBaseUrl}}"],
+              "path": ["execute"]
             },
             "description": "Floods stdout past the output ceiling \u2192 OUTPUT_LIMIT_EXCEEDED (truncated).",
             "body": {
@@ -292,12 +252,8 @@
             ],
             "url": {
               "raw": "{{execBaseUrl}}/execute",
-              "host": [
-                "{{execBaseUrl}}"
-              ],
-              "path": [
-                "execute"
-              ]
+              "host": ["{{execBaseUrl}}"],
+              "path": ["execute"]
             },
             "description": "422 with code VALIDATION_ERROR.",
             "body": {
@@ -318,12 +274,8 @@
             ],
             "url": {
               "raw": "{{execBaseUrl}}/execute",
-              "host": [
-                "{{execBaseUrl}}"
-              ],
-              "path": [
-                "execute"
-              ]
+              "host": ["{{execBaseUrl}}"],
+              "path": ["execute"]
             },
             "description": "422.",
             "body": {
@@ -344,12 +296,8 @@
             ],
             "url": {
               "raw": "{{execBaseUrl}}/execute",
-              "host": [
-                "{{execBaseUrl}}"
-              ],
-              "path": [
-                "execute"
-              ]
+              "host": ["{{execBaseUrl}}"],
+              "path": ["execute"]
             },
             "description": "Lower priority number jumps the queue.",
             "body": {

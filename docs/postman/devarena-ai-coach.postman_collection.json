@@ -34,13 +34,8 @@
             ],
             "url": {
               "raw": "{{baseUrl}}/ai/hint",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "ai",
-                "hint"
-              ]
+              "host": ["{{baseUrl}}"],
+              "path": ["ai", "hint"]
             },
             "auth": {
               "type": "bearer",
@@ -71,13 +66,8 @@
             ],
             "url": {
               "raw": "{{baseUrl}}/ai/hint",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "ai",
-                "hint"
-              ]
+              "host": ["{{baseUrl}}"],
+              "path": ["ai", "hint"]
             },
             "auth": {
               "type": "bearer",
@@ -108,13 +98,8 @@
             ],
             "url": {
               "raw": "{{baseUrl}}/ai/complexity",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "ai",
-                "complexity"
-              ]
+              "host": ["{{baseUrl}}"],
+              "path": ["ai", "complexity"]
             },
             "auth": {
               "type": "bearer",
@@ -145,13 +130,8 @@
             ],
             "url": {
               "raw": "{{baseUrl}}/ai/review",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "ai",
-                "review"
-              ]
+              "host": ["{{baseUrl}}"],
+              "path": ["ai", "review"]
             },
             "auth": {
               "type": "bearer",
@@ -182,13 +162,8 @@
             ],
             "url": {
               "raw": "{{baseUrl}}/ai/interview",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "ai",
-                "interview"
-              ]
+              "host": ["{{baseUrl}}"],
+              "path": ["ai", "interview"]
             },
             "auth": {
               "type": "bearer",
@@ -219,13 +194,8 @@
             ],
             "url": {
               "raw": "{{baseUrl}}/ai/learning",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "ai",
-                "learning"
-              ]
+              "host": ["{{baseUrl}}"],
+              "path": ["ai", "learning"]
             },
             "auth": {
               "type": "bearer",
@@ -256,13 +226,8 @@
             ],
             "url": {
               "raw": "{{baseUrl}}/ai/recommend",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "ai",
-                "recommend"
-              ]
+              "host": ["{{baseUrl}}"],
+              "path": ["ai", "recommend"]
             },
             "auth": {
               "type": "bearer",
@@ -298,13 +263,8 @@
             ],
             "url": {
               "raw": "{{baseUrl}}/ai/history?limit=20",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "ai",
-                "history"
-              ],
+              "host": ["{{baseUrl}}"],
+              "path": ["ai", "history"],
               "query": [
                 {
                   "key": "limit",
@@ -343,13 +303,8 @@
             ],
             "url": {
               "raw": "{{baseUrl}}/ai/hint",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "ai",
-                "hint"
-              ]
+              "host": ["{{baseUrl}}"],
+              "path": ["ai", "hint"]
             },
             "auth": {
               "type": "bearer",
@@ -380,13 +335,8 @@
             ],
             "url": {
               "raw": "{{baseUrl}}/ai/review",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "ai",
-                "review"
-              ]
+              "host": ["{{baseUrl}}"],
+              "path": ["ai", "review"]
             },
             "auth": {
               "type": "bearer",
@@ -417,13 +367,8 @@
             ],
             "url": {
               "raw": "{{baseUrl}}/ai/review",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "ai",
-                "review"
-              ]
+              "host": ["{{baseUrl}}"],
+              "path": ["ai", "review"]
             },
             "auth": {
               "type": "bearer",

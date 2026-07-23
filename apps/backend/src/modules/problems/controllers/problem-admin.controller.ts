@@ -185,12 +185,10 @@ export class ProblemAdminController {
   ): Promise<void> => {
     try {
       const body = getValidated<UpsertCompanyDto>(req, 'body');
-      res
-        .status(201)
-        .json({
-          success: true,
-          data: await this.taxonomyService.upsertCompany(body.name, body.logoUrl, req.user!),
-        });
+      res.status(201).json({
+        success: true,
+        data: await this.taxonomyService.upsertCompany(body.name, body.logoUrl, req.user!),
+      });
     } catch (err) {
       next(err);
     }

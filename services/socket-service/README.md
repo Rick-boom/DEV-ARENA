@@ -29,7 +29,7 @@ socket.emit('room:create', { type: 'battle' }, (res) => console.log(res));
 - **Gateway** owns the connection lifecycle (limits, rate limiting,
   handler registration, heartbeat, disconnect cleanup). No business rules.
 - **Managers** (`RoomManager`, `PresenceManager`) hold every rule —
-  capacity, ownership, presence — and depend on store *interfaces*, not
+  capacity, ownership, presence — and depend on store _interfaces_, not
   Redis, so they unit-test with in-memory fakes.
 - **Redis stores** hold authoritative room/presence state shared across
   nodes; the **Redis adapter** fans broadcasts out across nodes. Together

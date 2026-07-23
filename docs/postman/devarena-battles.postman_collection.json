@@ -34,13 +34,8 @@
             ],
             "url": {
               "raw": "{{baseUrl}}/battle/create",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "battle",
-                "create"
-              ]
+              "host": ["{{baseUrl}}"],
+              "path": ["battle", "create"]
             },
             "auth": {
               "type": "bearer",
@@ -71,13 +66,8 @@
             ],
             "url": {
               "raw": "{{baseUrl}}/battle/join",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "battle",
-                "join"
-              ]
+              "host": ["{{baseUrl}}"],
+              "path": ["battle", "join"]
             },
             "auth": {
               "type": "bearer",
@@ -108,13 +98,8 @@
             ],
             "url": {
               "raw": "{{baseUrl}}/battle/join",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "battle",
-                "join"
-              ]
+              "host": ["{{baseUrl}}"],
+              "path": ["battle", "join"]
             },
             "auth": {
               "type": "bearer",
@@ -145,13 +130,8 @@
             ],
             "url": {
               "raw": "{{baseUrl}}/battle/join",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "battle",
-                "join"
-              ]
+              "host": ["{{baseUrl}}"],
+              "path": ["battle", "join"]
             },
             "auth": {
               "type": "bearer",
@@ -182,13 +162,8 @@
             ],
             "url": {
               "raw": "{{baseUrl}}/battle/start",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "battle",
-                "start"
-              ]
+              "host": ["{{baseUrl}}"],
+              "path": ["battle", "start"]
             },
             "auth": {
               "type": "bearer",
@@ -219,13 +194,8 @@
             ],
             "url": {
               "raw": "{{baseUrl}}/battle/pause",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "battle",
-                "pause"
-              ]
+              "host": ["{{baseUrl}}"],
+              "path": ["battle", "pause"]
             },
             "auth": {
               "type": "bearer",
@@ -256,13 +226,8 @@
             ],
             "url": {
               "raw": "{{baseUrl}}/battle/resume",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "battle",
-                "resume"
-              ]
+              "host": ["{{baseUrl}}"],
+              "path": ["battle", "resume"]
             },
             "auth": {
               "type": "bearer",
@@ -293,13 +258,8 @@
             ],
             "url": {
               "raw": "{{baseUrl}}/battle/finish",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "battle",
-                "finish"
-              ]
+              "host": ["{{baseUrl}}"],
+              "path": ["battle", "finish"]
             },
             "auth": {
               "type": "bearer",
@@ -330,13 +290,8 @@
             ],
             "url": {
               "raw": "{{baseUrl}}/battle/rematch",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "battle",
-                "rematch"
-              ]
+              "host": ["{{baseUrl}}"],
+              "path": ["battle", "rematch"]
             },
             "auth": {
               "type": "bearer",
@@ -372,13 +327,8 @@
             ],
             "url": {
               "raw": "{{baseUrl}}/battle/{{battleId}}",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "battle",
-                "{{battleId}}"
-              ]
+              "host": ["{{baseUrl}}"],
+              "path": ["battle", "{{battleId}}"]
             },
             "auth": {
               "type": "bearer",
@@ -405,13 +355,8 @@
             ],
             "url": {
               "raw": "{{baseUrl}}/battle/history?page=1&pageSize=20",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "battle",
-                "history?page=1&pageSize=20"
-              ]
+              "host": ["{{baseUrl}}"],
+              "path": ["battle", "history?page=1&pageSize=20"]
             },
             "auth": {
               "type": "bearer",
@@ -438,14 +383,8 @@
             ],
             "url": {
               "raw": "{{baseUrl}}/battle/{{battleId}}/replay",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "battle",
-                "{{battleId}}",
-                "replay"
-              ]
+              "host": ["{{baseUrl}}"],
+              "path": ["battle", "{{battleId}}", "replay"]
             },
             "auth": {
               "type": "bearer",
@@ -477,13 +416,8 @@
             ],
             "url": {
               "raw": "{{baseUrl}}/battle/join",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "battle",
-                "join"
-              ]
+              "host": ["{{baseUrl}}"],
+              "path": ["battle", "join"]
             },
             "auth": {
               "type": "bearer",
@@ -514,13 +448,8 @@
             ],
             "url": {
               "raw": "{{baseUrl}}/battle/join",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "battle",
-                "join"
-              ]
+              "host": ["{{baseUrl}}"],
+              "path": ["battle", "join"]
             },
             "auth": {
               "type": "bearer",
@@ -551,13 +480,8 @@
             ],
             "url": {
               "raw": "{{baseUrl}}/battle/start",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "battle",
-                "start"
-              ]
+              "host": ["{{baseUrl}}"],
+              "path": ["battle", "start"]
             },
             "auth": {
               "type": "bearer",

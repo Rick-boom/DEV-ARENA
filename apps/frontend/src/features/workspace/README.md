@@ -45,7 +45,7 @@ polls until the verdict is terminal, with a hard timeout so a silent judge
 produces a clear message rather than an endless spinner. Polling rather than a
 socket keeps this module independent of the realtime layer.
 
-**Verdicts get plain language.** Every verdict carries a full label *and* an
+**Verdicts get plain language.** Every verdict carries a full label _and_ an
 explanation — "MLE" means nothing to a beginner, "Memory Limit Exceeded / your
 solution used more memory than allowed" is actionable. A test asserts no verdict
 is missing either.
@@ -60,13 +60,13 @@ gated the same way.
 
 ## Performance
 
-| Technique | Where |
-|---|---|
-| Code splitting | Monaco, workspace, explorer and dashboard are separate chunks |
-| Lazy loading | `React.lazy` per route + a nested lazy boundary for the editor |
-| Virtualization | `@tanstack/react-virtual` in the results list |
-| Memoization | `ProblemRow` is memoized — filter keystrokes re-render the list otherwise |
-| Debouncing | Search input (300ms) and draft autosave (800ms) |
+| Technique         | Where                                                                            |
+| ----------------- | -------------------------------------------------------------------------------- |
+| Code splitting    | Monaco, workspace, explorer and dashboard are separate chunks                    |
+| Lazy loading      | `React.lazy` per route + a nested lazy boundary for the editor                   |
+| Virtualization    | `@tanstack/react-virtual` in the results list                                    |
+| Memoization       | `ProblemRow` is memoized — filter keystrokes re-render the list otherwise        |
+| Debouncing        | Search input (300ms) and draft autosave (800ms)                                  |
 | Cache granularity | RTK Query tags are per-problem-id, so one bookmark doesn't refetch the catalogue |
 
 Verified in the build output: the workspace and editor land in their own chunks
@@ -91,11 +91,11 @@ Progress bars carry `aria-valuenow`/`max`.
 
 ## Keyboard shortcuts
 
-| Shortcut | Action |
-|---|---|
-| `Ctrl/⌘ + Enter` | Run |
-| `Ctrl/⌘ + Shift + Enter` | Submit |
-| `Ctrl/⌘ + Shift + F` | Format document |
+| Shortcut                 | Action          |
+| ------------------------ | --------------- |
+| `Ctrl/⌘ + Enter`         | Run             |
+| `Ctrl/⌘ + Shift + Enter` | Submit          |
+| `Ctrl/⌘ + Shift + F`     | Format document |
 
 ## Tests — 50 in this module (122 total)
 

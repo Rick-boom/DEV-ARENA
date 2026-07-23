@@ -28,12 +28,8 @@
             "method": "GET",
             "url": {
               "raw": "{{httpUrl}}/health",
-              "host": [
-                "{{httpUrl}}"
-              ],
-              "path": [
-                "health"
-              ]
+              "host": ["{{httpUrl}}"],
+              "path": ["health"]
             }
           }
         },
@@ -43,12 +39,8 @@
             "method": "GET",
             "url": {
               "raw": "{{httpUrl}}/docs.json",
-              "host": [
-                "{{httpUrl}}"
-              ],
-              "path": [
-                "docs.json"
-              ]
+              "host": ["{{httpUrl}}"],
+              "path": ["docs.json"]
             }
           }
         }

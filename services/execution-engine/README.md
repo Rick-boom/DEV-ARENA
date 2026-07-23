@@ -6,9 +6,9 @@ containers, dispatched over a BullMQ work queue.
 
 ## Two processes
 
-| Process  | Entry              | Role                                             |
-| -------- | ------------------ | ------------------------------------------------ |
-| **API**  | `dist/server.js`   | `POST /execute` → enqueue → await verdict. Stateless; scale freely. |
+| Process    | Entry            | Role                                                                   |
+| ---------- | ---------------- | ---------------------------------------------------------------------- |
+| **API**    | `dist/server.js` | `POST /execute` → enqueue → await verdict. Stateless; scale freely.    |
 | **Worker** | `dist/index.js`  | Pull jobs → run Docker sandbox → return verdict. Scale for throughput. |
 
 The API needs Redis. The **worker** additionally needs the host Docker

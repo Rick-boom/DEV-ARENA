@@ -23,10 +23,10 @@ src/
 
 ## Session model
 
-| Credential | Where it lives | Why |
-|---|---|---|
-| Access token | in-memory module closure | anything in `localStorage` is readable by any XSS payload |
-| Refresh token | httpOnly cookie | JS cannot read it at all; survives reload for persistent login |
+| Credential    | Where it lives           | Why                                                            |
+| ------------- | ------------------------ | -------------------------------------------------------------- |
+| Access token  | in-memory module closure | anything in `localStorage` is readable by any XSS payload      |
+| Refresh token | httpOnly cookie          | JS cannot read it at all; survives reload for persistent login |
 
 Auth status starts at `IDLE`, not `UNAUTHENTICATED`. On boot the app asks
 `/auth/refresh` whether the cookie still identifies someone, and guards hold a
@@ -95,7 +95,7 @@ stock illustration, and it costs one column of text.
 Skip link · visible focus rings everywhere · labelled fields wired with
 `aria-describedby` + `aria-invalid` via one `FormField` contract · live regions
 for toasts and status · `aria-current` on active nav · accurate accessible names
-that state what a control *does* · full keyboard navigation (Radix supplies
+that state what a control _does_ · full keyboard navigation (Radix supplies
 roving focus and Escape handling for menus) · `prefers-reduced-motion` respected
 in both CSS and Framer Motion.
 

@@ -12,14 +12,14 @@ asynchronous; poll `GET /submission/:id/result` or listen for the
 
 Request body:
 
-| field | type | required | notes |
-|---|---|---|---|
-| `problemId` | uuid | yes | |
-| `battleId` | uuid | no | raises queue priority when present |
-| `language` | enum | yes | JAVASCRIPT, TYPESCRIPT, PYTHON, CPP, JAVA |
-| `code` | string | yes | ≤ 100 KB |
-| `comparisonMode` | enum | no | EXACT, WHITESPACE (default), FLOAT, CUSTOM |
-| `stopOnFirstFailure` | bool | no | default true (ICPC-style); false = full partial scoring |
+| field                | type   | required | notes                                                   |
+| -------------------- | ------ | -------- | ------------------------------------------------------- |
+| `problemId`          | uuid   | yes      |                                                         |
+| `battleId`           | uuid   | no       | raises queue priority when present                      |
+| `language`           | enum   | yes      | JAVASCRIPT, TYPESCRIPT, PYTHON, CPP, JAVA               |
+| `code`               | string | yes      | ≤ 100 KB                                                |
+| `comparisonMode`     | enum   | no       | EXACT, WHITESPACE (default), FLOAT, CUSTOM              |
+| `stopOnFirstFailure` | bool   | no       | default true (ICPC-style); false = full partial scoring |
 
 Responses: `202` queued · `409` DUPLICATE_SUBMISSION · `422` INVALID_LANGUAGE ·
 `429` SUBMISSION_RATE_LIMITED · `503` QUEUE_UNAVAILABLE.

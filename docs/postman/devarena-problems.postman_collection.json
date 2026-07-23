@@ -34,12 +34,8 @@
             ],
             "url": {
               "raw": "{{baseUrl}}/problems?page=1&pageSize=20&sortBy=newest",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "problems"
-              ],
+              "host": ["{{baseUrl}}"],
+              "path": ["problems"],
               "query": [
                 {
                   "key": "page",
@@ -70,12 +66,8 @@
             ],
             "url": {
               "raw": "{{baseUrl}}/problems?difficulty=EASY&tags=array,hash-table&companies=google&sortBy=acceptance",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "problems"
-              ],
+              "host": ["{{baseUrl}}"],
+              "path": ["problems"],
               "query": [
                 {
                   "key": "difficulty",
@@ -110,13 +102,8 @@
             ],
             "url": {
               "raw": "{{baseUrl}}/problems/search?q=two sum",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "problems",
-                "search"
-              ],
+              "host": ["{{baseUrl}}"],
+              "path": ["problems", "search"],
               "query": [
                 {
                   "key": "q",
@@ -139,13 +126,8 @@
             ],
             "url": {
               "raw": "{{baseUrl}}/problems/trending",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "problems",
-                "trending"
-              ]
+              "host": ["{{baseUrl}}"],
+              "path": ["problems", "trending"]
             },
             "description": ""
           }
@@ -162,13 +144,8 @@
             ],
             "url": {
               "raw": "{{baseUrl}}/problems/recently-solved",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "problems",
-                "recently-solved"
-              ]
+              "host": ["{{baseUrl}}"],
+              "path": ["problems", "recently-solved"]
             },
             "description": "",
             "auth": {
@@ -195,13 +172,8 @@
             ],
             "url": {
               "raw": "{{baseUrl}}/problems/{{problemId}}",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "problems",
-                "{{problemId}}"
-              ]
+              "host": ["{{baseUrl}}"],
+              "path": ["problems", "{{problemId}}"]
             },
             "description": ""
           }
@@ -218,12 +190,8 @@
             ],
             "url": {
               "raw": "{{baseUrl}}/tags",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "tags"
-              ]
+              "host": ["{{baseUrl}}"],
+              "path": ["tags"]
             },
             "description": ""
           }
@@ -240,12 +208,8 @@
             ],
             "url": {
               "raw": "{{baseUrl}}/companies",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "companies"
-              ]
+              "host": ["{{baseUrl}}"],
+              "path": ["companies"]
             },
             "description": ""
           }
@@ -267,13 +231,8 @@
             ],
             "url": {
               "raw": "{{baseUrl}}/problems/bookmarks",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "problems",
-                "bookmarks"
-              ]
+              "host": ["{{baseUrl}}"],
+              "path": ["problems", "bookmarks"]
             },
             "description": "",
             "auth": {
@@ -300,14 +259,8 @@
             ],
             "url": {
               "raw": "{{baseUrl}}/problems/{{problemId}}/bookmark",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "problems",
-                "{{problemId}}",
-                "bookmark"
-              ]
+              "host": ["{{baseUrl}}"],
+              "path": ["problems", "{{problemId}}", "bookmark"]
             },
             "description": "",
             "auth": {
@@ -334,14 +287,8 @@
             ],
             "url": {
               "raw": "{{baseUrl}}/problems/{{problemId}}/bookmark",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "problems",
-                "{{problemId}}",
-                "bookmark"
-              ]
+              "host": ["{{baseUrl}}"],
+              "path": ["problems", "{{problemId}}", "bookmark"]
             },
             "description": "",
             "auth": {
@@ -373,13 +320,8 @@
             ],
             "url": {
               "raw": "{{baseUrl}}/admin/problems",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "admin",
-                "problems"
-              ]
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "problems"]
             },
             "description": "",
             "body": {
@@ -410,14 +352,8 @@
             ],
             "url": {
               "raw": "{{baseUrl}}/admin/problems/{{problemId}}",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "admin",
-                "problems",
-                "{{problemId}}"
-              ]
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "problems", "{{problemId}}"]
             },
             "description": "",
             "auth": {
@@ -444,14 +380,8 @@
             ],
             "url": {
               "raw": "{{baseUrl}}/admin/problems/{{problemId}}",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "admin",
-                "problems",
-                "{{problemId}}"
-              ]
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "problems", "{{problemId}}"]
             },
             "description": "409 VERSION_CONFLICT if expectedVersion is stale.",
             "body": {
@@ -482,14 +412,8 @@
             ],
             "url": {
               "raw": "{{baseUrl}}/admin/problems/{{problemId}}",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "admin",
-                "problems",
-                "{{problemId}}"
-              ]
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "problems", "{{problemId}}"]
             },
             "description": "",
             "auth": {
@@ -516,15 +440,8 @@
             ],
             "url": {
               "raw": "{{baseUrl}}/admin/problems/{{problemId}}/publish",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "admin",
-                "problems",
-                "{{problemId}}",
-                "publish"
-              ]
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "problems", "{{problemId}}", "publish"]
             },
             "description": "",
             "auth": {
@@ -551,15 +468,8 @@
             ],
             "url": {
               "raw": "{{baseUrl}}/admin/problems/{{problemId}}/archive",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "admin",
-                "problems",
-                "{{problemId}}",
-                "archive"
-              ]
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "problems", "{{problemId}}", "archive"]
             },
             "description": "",
             "auth": {
@@ -586,15 +496,8 @@
             ],
             "url": {
               "raw": "{{baseUrl}}/admin/problems/{{problemId}}/test-cases",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "admin",
-                "problems",
-                "{{problemId}}",
-                "test-cases"
-              ]
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "problems", "{{problemId}}", "test-cases"]
             },
             "description": "",
             "body": {
@@ -625,15 +528,8 @@
             ],
             "url": {
               "raw": "{{baseUrl}}/admin/problems/{{problemId}}/editorial",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "admin",
-                "problems",
-                "{{problemId}}",
-                "editorial"
-              ]
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "problems", "{{problemId}}", "editorial"]
             },
             "description": "",
             "body": {
@@ -664,15 +560,8 @@
             ],
             "url": {
               "raw": "{{baseUrl}}/admin/problems/{{problemId}}/hints",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "admin",
-                "problems",
-                "{{problemId}}",
-                "hints"
-              ]
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "problems", "{{problemId}}", "hints"]
             },
             "description": "",
             "body": {
@@ -703,15 +592,8 @@
             ],
             "url": {
               "raw": "{{baseUrl}}/admin/problems/{{problemId}}/versions",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "admin",
-                "problems",
-                "{{problemId}}",
-                "versions"
-              ]
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "problems", "{{problemId}}", "versions"]
             },
             "description": "",
             "auth": {
@@ -738,16 +620,8 @@
             ],
             "url": {
               "raw": "{{baseUrl}}/admin/problems/{{problemId}}/versions/1",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "admin",
-                "problems",
-                "{{problemId}}",
-                "versions",
-                "1"
-              ]
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "problems", "{{problemId}}", "versions", "1"]
             },
             "description": "",
             "auth": {
@@ -774,13 +648,8 @@
             ],
             "url": {
               "raw": "{{baseUrl}}/admin/tags",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "admin",
-                "tags"
-              ]
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "tags"]
             },
             "description": "",
             "body": {
@@ -811,13 +680,8 @@
             ],
             "url": {
               "raw": "{{baseUrl}}/admin/companies",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "admin",
-                "companies"
-              ]
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "companies"]
             },
             "description": "",
             "body": {

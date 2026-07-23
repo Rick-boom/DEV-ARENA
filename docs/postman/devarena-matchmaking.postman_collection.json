@@ -34,13 +34,8 @@
             ],
             "url": {
               "raw": "{{baseUrl}}/queue/join",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "queue",
-                "join"
-              ]
+              "host": ["{{baseUrl}}"],
+              "path": ["queue", "join"]
             },
             "auth": {
               "type": "bearer",
@@ -71,13 +66,8 @@
             ],
             "url": {
               "raw": "{{baseUrl}}/queue/join",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "queue",
-                "join"
-              ]
+              "host": ["{{baseUrl}}"],
+              "path": ["queue", "join"]
             },
             "auth": {
               "type": "bearer",
@@ -108,13 +98,8 @@
             ],
             "url": {
               "raw": "{{baseUrl}}/queue/join",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "queue",
-                "join"
-              ]
+              "host": ["{{baseUrl}}"],
+              "path": ["queue", "join"]
             },
             "auth": {
               "type": "bearer",
@@ -145,13 +130,8 @@
             ],
             "url": {
               "raw": "{{baseUrl}}/queue/join",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "queue",
-                "join"
-              ]
+              "host": ["{{baseUrl}}"],
+              "path": ["queue", "join"]
             },
             "auth": {
               "type": "bearer",
@@ -182,13 +162,8 @@
             ],
             "url": {
               "raw": "{{baseUrl}}/queue/leave",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "queue",
-                "leave"
-              ]
+              "host": ["{{baseUrl}}"],
+              "path": ["queue", "leave"]
             },
             "auth": {
               "type": "bearer",
@@ -215,13 +190,8 @@
             ],
             "url": {
               "raw": "{{baseUrl}}/queue/status",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "queue",
-                "status"
-              ]
+              "host": ["{{baseUrl}}"],
+              "path": ["queue", "status"]
             },
             "auth": {
               "type": "bearer",
@@ -248,13 +218,8 @@
             ],
             "url": {
               "raw": "{{baseUrl}}/queue/reconnect",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "queue",
-                "reconnect"
-              ]
+              "host": ["{{baseUrl}}"],
+              "path": ["queue", "reconnect"]
             },
             "auth": {
               "type": "bearer",
@@ -286,12 +251,8 @@
             ],
             "url": {
               "raw": "{{baseUrl}}/leaderboard?scope=GLOBAL&period=ALL_TIME&page=1&pageSize=50",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "leaderboard"
-              ],
+              "host": ["{{baseUrl}}"],
+              "path": ["leaderboard"],
               "query": [
                 {
                   "key": "scope",
@@ -340,12 +301,8 @@
             ],
             "url": {
               "raw": "{{baseUrl}}/leaderboard?scope=COUNTRY&country=US&period=WEEKLY&page=1&pageSize=25",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "leaderboard"
-              ],
+              "host": ["{{baseUrl}}"],
+              "path": ["leaderboard"],
               "query": [
                 {
                   "key": "scope",
@@ -399,13 +356,8 @@
             ],
             "url": {
               "raw": "{{baseUrl}}/leaderboard/global?period=MONTHLY&page=1&pageSize=50",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "leaderboard",
-                "global"
-              ],
+              "host": ["{{baseUrl}}"],
+              "path": ["leaderboard", "global"],
               "query": [
                 {
                   "key": "period",
@@ -449,13 +401,8 @@
             ],
             "url": {
               "raw": "{{baseUrl}}/leaderboard/friends?period=ALL_TIME&page=1&pageSize=50",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "leaderboard",
-                "friends"
-              ],
+              "host": ["{{baseUrl}}"],
+              "path": ["leaderboard", "friends"],
               "query": [
                 {
                   "key": "period",
@@ -504,13 +451,8 @@
             ],
             "url": {
               "raw": "{{baseUrl}}/rating/history?limit=50",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "rating",
-                "history"
-              ],
+              "host": ["{{baseUrl}}"],
+              "path": ["rating", "history"],
               "query": [
                 {
                   "key": "limit",
@@ -549,13 +491,8 @@
             ],
             "url": {
               "raw": "{{baseUrl}}/queue/join",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "queue",
-                "join"
-              ]
+              "host": ["{{baseUrl}}"],
+              "path": ["queue", "join"]
             },
             "auth": {
               "type": "bearer",
@@ -586,13 +523,8 @@
             ],
             "url": {
               "raw": "{{baseUrl}}/queue/leave",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "queue",
-                "leave"
-              ]
+              "host": ["{{baseUrl}}"],
+              "path": ["queue", "leave"]
             },
             "auth": {
               "type": "bearer",
@@ -619,13 +551,8 @@
             ],
             "url": {
               "raw": "{{baseUrl}}/queue/join",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "queue",
-                "join"
-              ]
+              "host": ["{{baseUrl}}"],
+              "path": ["queue", "join"]
             },
             "auth": {
               "type": "bearer",

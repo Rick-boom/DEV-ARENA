@@ -26,14 +26,14 @@ import { IndexedDbStore } from './collaboration';
   options={{
     roomName: 'battle-123',
     roomType: 'battle',
-    identity: { userId, username, avatarUrl },   // color auto-derived
-    socket,                                       // your existing Socket.IO client
+    identity: { userId, username, avatarUrl }, // color auto-derived
+    socket, // your existing Socket.IO client
     language: 'typescript',
     file: 'solution.ts',
-    offlineStore: new IndexedDbStore(),           // enables offline support
-    enableVersionRecovery: true,                  // enables snapshots
+    offlineStore: new IndexedDbStore(), // enables offline support
+    enableVersionRecovery: true, // enables snapshots
   }}
-/>
+/>;
 ```
 
 The hooks (`useCollaborationSession`, `useMonacoCollaboration`, `usePresence`)
@@ -45,7 +45,7 @@ are exported for building a custom UI.
   edit independently that always converges once updates are exchanged, with no
   central arbiter. Yjs provides a **text CRDT (YATA)**: every inserted character
   is an immutable item with a unique `(client, clock)` id linked to the item it
-  followed. This is what makes editing *conflict-free by construction*.
+  followed. This is what makes editing _conflict-free by construction_.
 - **Deterministic concurrent ordering** — when two people insert at the "same"
   spot, the item ids break the tie identically on every peer, so nothing is lost
   and everyone sees the same order. (`conflict.test.ts` proves this.)
@@ -55,7 +55,7 @@ are exported for building a custom UI.
 - **State-vector sync (SyncStep1/2)** — a peer sends a compact summary of what
   it has seen; the other replies with only the missing diff. Reconnect just
   re-runs this, so catch-up is O(missed updates). (`providers/socket-io-provider.ts`.)
-- **Awareness** — an *ephemeral* CRDT sibling (last-write-wins per client, with
+- **Awareness** — an _ephemeral_ CRDT sibling (last-write-wins per client, with
   timeout) for cursors, selections, and presence, kept **out** of the document
   so it vanishes when a user leaves. (`awareness/awareness-manager.ts`.)
 - **Origin-scoped UndoManager** — undo tracks only the local user's operations,

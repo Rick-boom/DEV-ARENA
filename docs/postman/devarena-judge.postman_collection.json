@@ -42,12 +42,8 @@
             ],
             "url": {
               "raw": "{{baseUrl}}/submission",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "submission"
-              ]
+              "host": ["{{baseUrl}}"],
+              "path": ["submission"]
             },
             "auth": {
               "type": "bearer",
@@ -78,12 +74,8 @@
             ],
             "url": {
               "raw": "{{baseUrl}}/submission",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "submission"
-              ]
+              "host": ["{{baseUrl}}"],
+              "path": ["submission"]
             },
             "auth": {
               "type": "bearer",
@@ -114,12 +106,8 @@
             ],
             "url": {
               "raw": "{{baseUrl}}/submission",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "submission"
-              ]
+              "host": ["{{baseUrl}}"],
+              "path": ["submission"]
             },
             "auth": {
               "type": "bearer",
@@ -155,13 +143,8 @@
             ],
             "url": {
               "raw": "{{baseUrl}}/submission/{{submissionId}}",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "submission",
-                "{{submissionId}}"
-              ]
+              "host": ["{{baseUrl}}"],
+              "path": ["submission", "{{submissionId}}"]
             },
             "auth": {
               "type": "bearer",
@@ -188,13 +171,8 @@
             ],
             "url": {
               "raw": "{{baseUrl}}/submission/result?submissionId={{submissionId}}",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "submission",
-                "result"
-              ],
+              "host": ["{{baseUrl}}"],
+              "path": ["submission", "result"],
               "query": [
                 {
                   "key": "submissionId",
@@ -228,13 +206,8 @@
             ],
             "url": {
               "raw": "{{baseUrl}}/submission/history?limit=20&offset=0",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "submission",
-                "history"
-              ],
+              "host": ["{{baseUrl}}"],
+              "path": ["submission", "history"],
               "query": [
                 {
                   "key": "limit",
@@ -278,12 +251,8 @@
             ],
             "url": {
               "raw": "{{baseUrl}}/submission",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "submission"
-              ]
+              "host": ["{{baseUrl}}"],
+              "path": ["submission"]
             },
             "auth": {
               "type": "bearer",
@@ -314,12 +283,8 @@
             ],
             "url": {
               "raw": "{{baseUrl}}/submission",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "submission"
-              ]
+              "host": ["{{baseUrl}}"],
+              "path": ["submission"]
             },
             "auth": {
               "type": "bearer",
@@ -350,13 +315,8 @@
             ],
             "url": {
               "raw": "{{baseUrl}}/submission/00000000-0000-4000-8000-000000000000",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "submission",
-                "00000000-0000-4000-8000-000000000000"
-              ]
+              "host": ["{{baseUrl}}"],
+              "path": ["submission", "00000000-0000-4000-8000-000000000000"]
             },
             "auth": {
               "type": "bearer",
@@ -383,12 +343,8 @@
             ],
             "url": {
               "raw": "{{baseUrl}}/submission",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "submission"
-              ]
+              "host": ["{{baseUrl}}"],
+              "path": ["submission"]
             },
             "auth": {
               "type": "bearer",

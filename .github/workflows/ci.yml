@@ -21,7 +21,6 @@ jobs:
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
-        
 
       - name: Setup Node 22 (with pnpm cache)
         uses: actions/setup-node@v4
